@@ -172,7 +172,7 @@ def log_validation(
     pipeline.set_progress_bar_config(disable=True)
 
     # run inference
-    generator = torch.Generator(device=accelerator.device).manual_seed(args.seed) if args.seed else None
+    generator = torch.Generator(device=accelerator.device).manual_seed(args.seed) if args.seed is not None else None
     # autocast_ctx = torch.autocast(accelerator.device.type) if not is_final_validation else nullcontext()
     autocast_ctx = nullcontext()
 
@@ -1716,9 +1716,9 @@ def main(args):
                 pipeline = FluxPipeline.from_pretrained(
                     args.pretrained_model_name_or_path,
                     vae=vae,
-                    text_encoder=accelerator.unwrap_model(text_encoder_one),
-                    text_encoder_2=accelerator.unwrap_model(text_encoder_two),
-                    transformer=accelerator.unwrap_model(transformer),
+                    text_encoder=accelerator.unwrap_model(text_encoder_one, keep_fp32_wrapper=False),
+                    text_encoder_2=accelerator.unwrap_model(text_encoder_two, keep_fp32_wrapper=False),
+                    transformer=accelerator.unwrap_model(transformer, keep_fp32_wrapper=False),
                     revision=args.revision,
                     variant=args.variant,
                     torch_dtype=weight_dtype,
